@@ -1,0 +1,24 @@
+@use "@sass/_utils.functions.scss" as *;
+@use "@sass/variables/_variables.colors.scss" as c;
+@use "@sass/mixins/_utils.mixins.scss" as mut;
+@use "@sass/_utils.functions.scss" as f;
+
+.adminBar {
+    @include mut.flexed(row, $align-items: flex-start, $gap: 60px);
+
+    position: fixed;
+    left: f.pxToRem(30px);
+    font-size: f.pxToRem(28px); 
+    .Link {
+        color: black;
+        margin-bottom: 10px;
+        &:hover {
+            cursor: pointer;
+            color: c.$dark-red-color;
+        }
+        &:focus {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+}

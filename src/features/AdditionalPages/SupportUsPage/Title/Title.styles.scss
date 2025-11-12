@@ -1,0 +1,53 @@
+@use "@sass/_utils.functions.scss" as f;
+@use "@sass/mixins/_utils.mixins.scss" as mut;
+@use "@assets/sass/variables/_variables.fonts.scss" as ft;
+
+.supportUsContainer{
+    .titleBlock{   
+        position: relative;
+        margin-bottom: 150px;
+    
+        .supportLogoSmall{
+            @include mut.with-font($font-family: ft.$roboto-font, $font-weight: 300, $font-size: 12px);
+            line-height: 14px;
+            text-transform: uppercase;
+            color: #891F16;
+    
+            text-align: right; 
+        }
+    
+        .supportLogoBig{
+            @include mut.with-font($font-family: ft.$closer-text-font, $font-weight: 500, $font-size: 96px);
+            line-height: 127px;
+            color: #F4F4F4;
+    
+            position: absolute;
+            top: 0;
+            left: 0;   
+        }
+
+        .content{
+            position: relative;
+            @include mut.with-font($font-family: ft.$roboto-font, $font-weight: 300, $font-size: 26px);
+            line-height: 28px;
+            color: #1D1F23;
+            margin: f.pxToRem(40px) 0 f.pxToRem(16px) 0; 
+            z-index: 1;
+        }
+
+        .subTitle{
+            @include mut.with-font($font-family: ft.$closer-text-font, $font-weight: 500, $font-size: 20px);
+            line-height: 26px;
+
+        }
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .supportUsContainer .titleBlock .supportLogoBig .content{
+        @include mut.with-font($font-family: ft.$closer-text-font, $font-weight: 500, $font-size: 54px);
+        line-height: 31px;    
+        top: f.pxToRem(20px);   
+        left: f.pxToRem(10px);      
+    }
+} 
