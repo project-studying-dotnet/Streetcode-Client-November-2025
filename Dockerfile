@@ -1,5 +1,8 @@
-﻿FROM node:alpine as build
+﻿FROM node:19.5.0-alpine AS build
 WORKDIR /app
+
+RUN apk add --no-cache git
+
 COPY package*.json /app/
 RUN npm install
 RUN npm install --global serve
