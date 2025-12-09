@@ -4,18 +4,26 @@ import Image, { ImageCreate } from '@models/media/image.model';
 
 import Streetcode from './streetcode-types.model';
 
+// Базовий інтерфейс для відображення факту
 export interface Fact {
   id: number;
   title: string;
   factContent: string;
-  image?: Image;
   imageId: number;
+  image?: Image;
 }
-export interface FactCreate extends Fact {
-  imageDescription?: string
+
+// Для створення нового факту
+export interface FactCreate {
+  title: string;
+  factContent: string;
+  imageId: number;
+  streetcodeId: number;
 }
-export interface FactUpdate extends FactCreate, IModelState, IPersisted {
-    streetcodeId?: number;
+
+// Для оновлення факту
+export interface FactUpdate extends Fact, IModelState, IPersisted {
+  streetcodeId?: number;
 }
 
 export interface Term {

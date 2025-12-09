@@ -62,6 +62,7 @@ interface Store {
     streetcodeMainPageStore: StreetcodesMainPageStore,
     relatedByTag: StreetcodesByTagStore,
     createUpdateMediaStore: CreateUpdateMediaStore,
+    modalStore: ModalStore,
 }
 
 export interface StreetcodeDataStore {
@@ -100,6 +101,7 @@ export const store: Store = {
     streetcodeMainPageStore: new StreetcodesMainPageStore(),
     relatedByTag: new StreetcodesByTagStore(),
     createUpdateMediaStore: new CreateUpdateMediaStore(),
+    modalStore: new ModalStore()
 };
 export const streetcodeDataStore:StreetcodeDataStore = {
     streetcodeStore: new StreetcodeStore(),

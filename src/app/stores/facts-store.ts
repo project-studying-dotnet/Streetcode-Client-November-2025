@@ -29,7 +29,7 @@ export default class FactsStore {
     public setImageDetails = (fact: FactCreate, imageDetailId: number) => {
         this.factImageDetailsMap.set(fact.imageId, { id: imageDetailId,
                                                      imageId: fact.imageId,
-                                                     alt: fact.imageDescription,
+                                                     alt: fact.title,
                                                      title: '' });
     };
 
@@ -59,7 +59,7 @@ export default class FactsStore {
         this.setItem(fact);
         this.factImageDetailsMap.set(
             fact.imageId,
-            { id: 0, imageId: fact.imageId, alt: fact.imageDescription, title: '' },
+            { id: 0, imageId: fact.imageId, alt: fact.title, title: '' },
         );
     };
 
@@ -91,11 +91,25 @@ export default class FactsStore {
         return Array<Fact>(0);
     };
 
-    public createFact = async (fact: Fact) => {
+    public createFact = async (factCreate: FactCreate): Promise<Fact | null> => {
         try {
-            await factsApi.create(fact);
-            this.setItem(fact);
-        } catch (error: unknown) { /* empty */ }
+            const createdFact = await factsApi.create(factCreate);
+            
+            runInAction(() => {
+                // Додаємо створений факт до map
+                const factToStore: FactUpdate = {
+                    ...createdFact,
+                    isPersisted: true,
+                    modelState: ModelState.Updated,
+                };
+                this.setItem(factToStore);
+            });
+            
+            return createdFact;
+        } catch (error: unknown) {
+            console.error('Error creating fact:', error);
+            return null;
+        }
     };
 
     public updateFact = async (fact: Fact) => {
