@@ -1,4 +1,4 @@
-// import './InterestingFactsAdminModal.style.scss';
+import './InterestingFactsAdminModal.styles.scss';
 
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
@@ -93,35 +93,45 @@ const InterestingFactsModal = ({ streetcodeId = 1 }: InterestingFactsModalProps)
         >
             <Form className="factForm" onFinish={onFinish}>
                 <h2>Wow-Факт</h2>
-                <p>Заголовок</p>
                 <div className="inputBlock">
+                    <p>Заголовок</p>
                     <Form.Item name="title">
                         <input />
                     </Form.Item>
+                </div>
+                <div className="textareaBlock">
                     <p>Основний текст</p>
-                    <textarea value={factContent} maxLength={600} onChange={(e) => setFactContent(e.target.value)} />
+                    <Form.Item name="mainText">
+                        <textarea value={factContent} maxLength={600} onChange={(e) => setFactContent(e.target.value)} />
+                    </Form.Item>
                     <p className="characterCounter">
                         {characterCount}
                         /600
                     </p>
                 </div>
-                <p>Зображення:</p>
-                <FormItem
-                    name="picture"
-                    className=""
-                >
-                    <Upload
-                        multiple={false}
-                        accept=".jpeg,.png,.jpg"
-                        listType="picture-card"
-                        maxCount={1}
-                    >
-                        <div className="upload">
-                            <InboxOutlined />
-                            <p>Виберіть чи перетягніть файл</p>
-                        </div>
-                    </Upload>
-                </FormItem>
+                <div className="uploadBlock">
+                    <p>Зображення:</p>
+                    <FormItem
+                        name="picture"
+                        className="">
+                        <Upload
+                            multiple={false}
+                            accept=".jpeg,.png,.jpg,.webp"
+                            listType="picture-card"
+                            maxCount={1}>
+                            <div className="upload">
+                                <InboxOutlined />
+                                <p>Виберіть чи перетягніть файл</p>
+                            </div>
+                        </Upload>
+                    </FormItem>
+                </div>
+                <div className="imageDescriptionBlock">
+                    <p>Підпис фото:</p>
+                    <Form.Item name="imageDescription">
+                            <input />
+                    </Form.Item>
+                </div>
                 <Button className="saveButton" htmlType="submit">Зберегти</Button>
             </Form>
         </Modal>
