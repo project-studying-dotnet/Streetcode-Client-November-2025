@@ -15,12 +15,23 @@ import { Fact, FactCreate } from '@/models/streetcode/text-contents.model';
 
 interface InterestingFactsModalProps {
     streetcodeId: number;
+    factToEdit?: Fact | null; // <-- new optional prop for edit mode
 }
 
-const InterestingFactsModal = ({ streetcodeId = 1 }: InterestingFactsModalProps) => {
-    const { modalStore, factsStore, imagesStore: { getImageArray, createImage } } = useMobx();
+const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: InterestingFactsModalProps) => {
+    const { modalStore, factsStore, imagesStore: { getImageArray, createImage, updateImage } } = useMobx();
     const { setModal, modalsState: { adminFacts } } = modalStore;
-    const [factContent, setFactContent] = useState('');
+
+    if (!adminFacts.isOpen) return null;
+
+    // Prefill state for edit
+    const [factContent, setFactContent] = useState(factToEdit ? factToEdit.factContent : '');
+    const [title, setTitle] = useState(factToEdit ? factToEdit.title : '');
+    const [imageId, setImageId] = useState<number | undefined>(factToEdit ? factToEdit.imageId : undefined); // Only number or undefined
+    // Removed imageDescription
+
+    // Upload state for edit mode
+    const [fileList, setFileList] = useState<UploadFile<any>[]>([]);
 
     const characterCount = factContent.length | 0;
 
@@ -39,86 +50,95 @@ const InterestingFactsModal = ({ streetcodeId = 1 }: InterestingFactsModalProps)
     };
 
     const onFinish = async (values: any) => {
-        // 1. Отримуємо файл з форми (Ant Design Upload component)
-        const uploadedFile = values.picture.file as UploadFile<any>;
-        const file = uploadedFile.originFileObj as File;
+        let imgId = imageId;
 
-        // 2. Витягуємо ім'я файлу (якщо є, інакше порожній рядок)
-        const fileName = uploadedFile.name ?? '';
-        
-        // 3. Витягуємо розширення файлу (наприклад, "jpg", "png")
-        const extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
-        
-        const base64 = await fileToBase64(file);
-
-        // 4. Створюємо об'єкт ImageCreate для завантаження зображення
-        const imageToCreate: ImageCreate = {
-            title: values.title || fileName,         // Назва зображення
-            baseFormat: base64,
-            mimeType: file.type ?? 'image/jpeg',     // image/jpeg, image/png, etc.
-            extension: extension,                     // jpg, png, jpeg, webp
-        };
-
-        const createdImage = await createImage(imageToCreate);
-
-        if (createdImage === null)
-        {
-            if (createdImage === null) {
-                throw new Error('Не вдалося створити зображення');
-            }
+        // Handle image: if user uploads a new one, process; else keep old for edit
+        if (values.picture && values.picture.file) {
+            const uploadedFile = values.picture.file as UploadFile<any>;
+            const file = uploadedFile.originFileObj as File;
+            const fileName = uploadedFile.name ?? '';
+            const extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+            const base64 = await fileToBase64(file);
+            const imageToCreate: ImageCreate = {
+                title: values.title || fileName,
+                baseFormat: base64,
+                mimeType: file.type ?? 'image/jpeg',
+                extension: extension,
+            };
+            const createdImage = await createImage(imageToCreate);
+            if (!createdImage) throw new Error('Не вдалося створити зображення');
+            imgId = createdImage.id;
         }
-        
-        const fact: FactCreate = {
-            title: values.title,
-            factContent: factContent,
-            imageId: createdImage.id,
-            streetcodeId: streetcodeId
-        };
 
-        await factsStore.createFact(fact);
-        
-        // Close the modal
-        setModal('adminFacts');
+        // imageId is required
+        if (!imgId) throw new Error('Зображення є обовʼязковим');
+
+        if (factToEdit) {
+            // Edit Fact: Update the fact (must send all fields)
+            const fact: Fact = {
+                id: factToEdit.id,
+                title,
+                factContent,
+                imageId: imgId,
+            };
+            await factsStore.updateFact(fact);
+        } else {
+            // Create Fact
+            const fact: FactCreate = {
+                title,
+                factContent,
+                imageId: imgId,
+                streetcodeId: streetcodeId,
+            };
+            await factsStore.createFact(fact);
+        }
+        setModal('adminFacts', undefined, false);
     };
 
     return (
         <Modal
             className="interestingFactsAdminModal"
             open={true}
-            onCancel={() => setModal('adminFacts')}
+            onCancel={() => setModal('adminFacts', undefined, false)}
             footer={null}
             maskClosable
             centered
             closeIcon={<CancelBtn />}
         >
-            <Form className="factForm" onFinish={onFinish}>
+            <Form className="factForm" onFinish={onFinish}
+                  initialValues={{
+                    title: title,
+                    mainText: factContent,
+                    // Removed imageDescription
+                  }}>
                 <h2>Wow-Факт</h2>
                 <div className="inputBlock">
                     <p>Заголовок</p>
-                    <Form.Item name="title">
-                        <input />
+                    <Form.Item name="title" rules={[{ required: true, message: 'Поле обовʼязкове' }]}> {/* add required validation */}
+                        <input value={title} onChange={e => setTitle(e.target.value)} maxLength={68}/>
                     </Form.Item>
                 </div>
                 <div className="textareaBlock">
                     <p>Основний текст</p>
-                    <Form.Item name="mainText">
+                    <Form.Item name="mainText" rules={[{ required: true, message: 'Поле обовʼязкове' }]}> {/* add required validation */}
                         <textarea value={factContent} maxLength={600} onChange={(e) => setFactContent(e.target.value)} />
                     </Form.Item>
                     <p className="characterCounter">
-                        {characterCount}
-                        /600
+                        {characterCount}/600
                     </p>
                 </div>
                 <div className="uploadBlock">
                     <p>Зображення:</p>
-                    <FormItem
-                        name="picture"
-                        className="">
+                    <FormItem name="picture" className="">
                         <Upload
                             multiple={false}
                             accept=".jpeg,.png,.jpg,.webp"
                             listType="picture-card"
-                            maxCount={1}>
+                            maxCount={1}
+                            fileList={fileList}
+                            onChange={({ fileList }) => setFileList(fileList)}
+                            beforeUpload={() => false} // prevent auto upload
+                        >
                             <div className="upload">
                                 <InboxOutlined />
                                 <p>Виберіть чи перетягніть файл</p>
@@ -126,13 +146,8 @@ const InterestingFactsModal = ({ streetcodeId = 1 }: InterestingFactsModalProps)
                         </Upload>
                     </FormItem>
                 </div>
-                <div className="imageDescriptionBlock">
-                    <p>Підпис фото:</p>
-                    <Form.Item name="imageDescription">
-                            <input />
-                    </Form.Item>
-                </div>
-                <Button className="saveButton" htmlType="submit">Зберегти</Button>
+                {/* imageDescription removed for now */}
+                <Button className="saveButton" htmlType="submit">{factToEdit ? 'Оновити' : 'Зберегти'}</Button>
             </Form>
         </Modal>
     );
