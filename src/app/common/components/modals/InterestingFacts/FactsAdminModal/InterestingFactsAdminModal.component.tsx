@@ -28,7 +28,7 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
     const [factContent, setFactContent] = useState(factToEdit ? factToEdit.factContent : '');
     const [title, setTitle] = useState(factToEdit ? factToEdit.title : '');
     const [imageId, setImageId] = useState<number | undefined>(factToEdit ? factToEdit.imageId : undefined); // Only number or undefined
-    // Removed imageDescription
+    const [imageDescription, setImageDescription] = useState<string | undefined>(factToEdit ? factToEdit.imageDescription : '');
 
     // Upload state for edit mode
     const [fileList, setFileList] = useState<UploadFile<any>[]>([]);
@@ -146,7 +146,12 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
                         </Upload>
                     </FormItem>
                 </div>
-                {/* imageDescription removed for now */}
+                <div className="imageDescriptionBlock">
+                    <p>Підпис до фото</p>
+                    <Form.Item name="imageDescription" rules={[{ required: true, message: 'Поле обовʼязкове' }]}>
+                        <input value={imageDescription} onChange={e => setTitle(e.target.value)} maxLength={68}/>
+                    </Form.Item>
+                </div>
                 <Button className="saveButton" htmlType="submit">{factToEdit ? 'Оновити' : 'Зберегти'}</Button>
             </Form>
         </Modal>

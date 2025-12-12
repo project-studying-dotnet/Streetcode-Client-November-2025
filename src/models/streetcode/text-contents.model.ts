@@ -11,6 +11,7 @@ export interface Fact {
   factContent: string;
   imageId: number;
   image?: Image;
+  imageDescription?: string;
 }
 
 // Для створення нового факту
@@ -19,11 +20,13 @@ export interface FactCreate {
   factContent: string;
   imageId: number;
   streetcodeId: number;
+  imageDescription?: string;
 }
 
 // Для оновлення факту
 export interface FactUpdate extends Fact, IModelState, IPersisted {
   streetcodeId?: number;
+  imageDescription?: string;
 }
 
 export interface Term {
