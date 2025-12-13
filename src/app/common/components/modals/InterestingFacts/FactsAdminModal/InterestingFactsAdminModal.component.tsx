@@ -1,7 +1,7 @@
 import './InterestingFactsAdminModal.styles.scss';
 
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { InboxOutlined } from '@ant-design/icons';
 import CancelBtn from '@assets/images/utils/Cancel_btn.svg';
 import useMobx from '@stores/root-store';
@@ -22,18 +22,25 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
     const { modalStore, factsStore, imagesStore: { getImageArray, createImage, updateImage } } = useMobx();
     const { setModal, modalsState: { adminFacts } } = modalStore;
 
+    const [form] = Form.useForm(); // <-- Створюємо інстанс форми
+
     if (!adminFacts.isOpen) return null;
 
-    // Prefill state for edit
-    const [factContent, setFactContent] = useState(factToEdit ? factToEdit.factContent : '');
-    const [title, setTitle] = useState(factToEdit ? factToEdit.title : '');
-    const [imageId, setImageId] = useState<number | undefined>(factToEdit ? factToEdit.imageId : undefined); // Only number or undefined
-    const [imageDescription, setImageDescription] = useState<string | undefined>(factToEdit ? factToEdit.imageDescription : '');
+    useEffect(() => {
+        if (factToEdit) {
+            form.setFieldsValue({
+                title: factToEdit.title,
+                mainText: factToEdit.factContent,
+                imageDescription: factToEdit.imageDescription,
+            });
+        }
+    }, [factToEdit, form]);
 
     // Upload state for edit mode
     const [fileList, setFileList] = useState<UploadFile<any>[]>([]);
 
-    const characterCount = factContent.length | 0;
+    const mainTextValue = Form.useWatch('mainText', form) || '';
+    const characterCount = mainTextValue.length;
 
     // Допоміжна функція: конвертує File в base64 string (data URL format)
     const fileToBase64 = (file: File): Promise<string> => {
@@ -50,48 +57,67 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
     };
 
     const onFinish = async (values: any) => {
-        let imgId = imageId;
+        let imgId = factToEdit?.imageId;
 
-        // Handle image: if user uploads a new one, process; else keep old for edit
-        if (values.picture && values.picture.file) {
-            const uploadedFile = values.picture.file as UploadFile<any>;
-            const file = uploadedFile.originFileObj as File;
+        // Handle image
+        if (values.picture && values.picture.fileList && values.picture.fileList.length > 0) {
+            const uploadedFile = values.picture.fileList[0]; // <-- Беремо з fileList
+            const file = uploadedFile.originFileObj as File; // <-- Це справжній File
+            
+            if (!file) {
+                Modal.error({ title: 'Помилка', content: 'Не вдалося отримати файл' });
+                return;
+            }
+            
             const fileName = uploadedFile.name ?? '';
             const extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
             const base64 = await fileToBase64(file);
+            
             const imageToCreate: ImageCreate = {
                 title: values.title || fileName,
                 baseFormat: base64,
                 mimeType: file.type ?? 'image/jpeg',
                 extension: extension,
             };
+            
             const createdImage = await createImage(imageToCreate);
-            if (!createdImage) throw new Error('Не вдалося створити зображення');
+            if (!createdImage) {
+                Modal.error({ title: 'Помилка', content: 'Не вдалося створити зображення' });
+                return;
+            }
             imgId = createdImage.id;
         }
 
-        // imageId is required
-        if (!imgId) throw new Error('Зображення є обовʼязковим');
+        // imageId is required (for create mode)
+        if (!imgId && !factToEdit) {
+            Modal.error({ title: 'Помилка', content: 'Зображення є обовʼязковим' });
+            return;
+        }
 
         if (factToEdit) {
-            // Edit Fact: Update the fact (must send all fields)
+            // Edit Fact
             const fact: Fact = {
                 id: factToEdit.id,
-                title,
-                factContent,
-                imageId: imgId,
+                title: values.title,
+                factContent: values.mainText,
+                imageId: imgId!,
+                order: factToEdit.order,
+                imageDescription: values.imageDescription,
             };
             await factsStore.updateFact(fact);
         } else {
             // Create Fact
             const fact: FactCreate = {
-                title,
-                factContent,
-                imageId: imgId,
+                title: values.title,
+                factContent: values.mainText,
+                imageId: imgId!,
+                imageDescription: values.imageDescription,
                 streetcodeId: streetcodeId,
             };
             await factsStore.createFact(fact);
         }
+        
+        form.resetFields();
         setModal('adminFacts', undefined, false);
     };
 
@@ -99,45 +125,70 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
         <Modal
             className="interestingFactsAdminModal"
             open={true}
-            onCancel={() => setModal('adminFacts', undefined, false)}
+            onCancel={() => {
+                form.resetFields();
+                setModal('adminFacts', undefined, false);
+            }}
             footer={null}
             maskClosable
             centered
             closeIcon={<CancelBtn />}
         >
-            <Form className="factForm" onFinish={onFinish}
-                  initialValues={{
-                    title: title,
-                    mainText: factContent,
-                    // Removed imageDescription
-                  }}>
+            <Form 
+                form={form}
+                className="factForm" 
+                onFinish={onFinish}
+                initialValues={{
+                    title: factToEdit?.title || '',
+                    mainText: factToEdit?.factContent || '',
+                    imageDescription: factToEdit?.imageDescription || '',
+                }}
+            >
                 <h2>Wow-Факт</h2>
+                
                 <div className="inputBlock">
                     <p>Заголовок</p>
-                    <Form.Item name="title" rules={[{ required: true, message: 'Поле обовʼязкове' }]}> {/* add required validation */}
-                        <input value={title} onChange={e => setTitle(e.target.value)} maxLength={68}/>
+                    <Form.Item 
+                        name="title" 
+                        rules={[
+                            { required: true, message: 'Поле обовʼязкове' },
+                            { max: 68, message: 'Максимум 68 символів' }
+                        ]}
+                    >
+                        <input maxLength={68} />
                     </Form.Item>
                 </div>
+                
                 <div className="textareaBlock">
                     <p>Основний текст</p>
-                    <Form.Item name="mainText" rules={[{ required: true, message: 'Поле обовʼязкове' }]}> {/* add required validation */}
-                        <textarea value={factContent} maxLength={600} onChange={(e) => setFactContent(e.target.value)} />
+                    <Form.Item 
+                        name="mainText" 
+                        rules={[
+                            { required: true, message: 'Поле обовʼязкове' },
+                            { max: 600, message: 'Максимум 600 символів' }
+                        ]}
+                    >
+                        <textarea maxLength={600} />
                     </Form.Item>
                     <p className="characterCounter">
                         {characterCount}/600
                     </p>
                 </div>
+                
                 <div className="uploadBlock">
                     <p>Зображення:</p>
-                    <FormItem name="picture" className="">
+                    <FormItem 
+                        name="picture"
+                        rules={[
+                            { required: !factToEdit, message: 'Зображення обовʼязкове' }
+                        ]}
+                    >
                         <Upload
                             multiple={false}
                             accept=".jpeg,.png,.jpg,.webp"
                             listType="picture-card"
                             maxCount={1}
-                            fileList={fileList}
-                            onChange={({ fileList }) => setFileList(fileList)}
-                            beforeUpload={() => false} // prevent auto upload
+                            beforeUpload={() => false}
                         >
                             <div className="upload">
                                 <InboxOutlined />
@@ -146,13 +197,23 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
                         </Upload>
                     </FormItem>
                 </div>
+                
                 <div className="imageDescriptionBlock">
                     <p>Підпис до фото</p>
-                    <Form.Item name="imageDescription" rules={[{ required: true, message: 'Поле обовʼязкове' }]}>
-                        <input value={imageDescription} onChange={e => setTitle(e.target.value)} maxLength={68}/>
+                    <Form.Item 
+                        name="imageDescription"
+                        rules={[
+                            { required: true, message: 'Поле обовʼязкове' },
+                            { max: 200, message: 'Максимум 200 символів' }
+                        ]}
+                    >
+                        <input maxLength={200} />
                     </Form.Item>
                 </div>
-                <Button className="saveButton" htmlType="submit">{factToEdit ? 'Оновити' : 'Зберегти'}</Button>
+                
+                <Button className="saveButton" htmlType="submit">
+                    {factToEdit ? 'Оновити' : 'Зберегти'}
+                </Button>
             </Form>
         </Modal>
     );
