@@ -1,48 +1,47 @@
 import './InterestingFactsAdminModal.styles.scss';
 
 import { observer } from 'mobx-react-lite';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { InboxOutlined } from '@ant-design/icons';
 import CancelBtn from '@assets/images/utils/Cancel_btn.svg';
 import useMobx from '@stores/root-store';
 
 import { Button, Form, Modal, Upload } from 'antd';
 import FormItem from 'antd/es/form/FormItem';
-import { UploadFile } from 'antd/lib/upload/interface';
 
-import Image, { ImageCreate } from '@/models/media/image.model';
+import { ImageCreate } from '@/models/media/image.model';
 import { Fact, FactCreate } from '@/models/streetcode/text-contents.model';
 
 interface InterestingFactsModalProps {
     streetcodeId: number;
-    factToEdit?: Fact | null; // <-- new optional prop for edit mode
+    factToEdit?: Fact | null;
 }
 
 const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: InterestingFactsModalProps) => {
-    const { modalStore, factsStore, imagesStore: { getImageArray, createImage, updateImage } } = useMobx();
+    const { modalStore, factsStore, imagesStore: { createImage } } = useMobx();
     const { setModal, modalsState: { adminFacts } } = modalStore;
+    const [form] = Form.useForm();
 
-    const [form] = Form.useForm(); // <-- Створюємо інстанс форми
+    const titleValue = Form.useWatch('title', form) || '';
+    const mainTextValue = Form.useWatch('mainText', form) || '';
+    const imageDescriptionValue = Form.useWatch('imageDescription', form) || '';
 
-    if (!adminFacts.isOpen) return null;
+    const titleCount = titleValue.length;
+    const mainTextCount = mainTextValue.length;
+    const imageDescCount = imageDescriptionValue.length;
 
     useEffect(() => {
-        if (factToEdit) {
+        if (adminFacts.isOpen && factToEdit) {
             form.setFieldsValue({
                 title: factToEdit.title,
                 mainText: factToEdit.factContent,
                 imageDescription: factToEdit.imageDescription,
             });
+        } else if (adminFacts.isOpen && !factToEdit) {
+            form.resetFields();
         }
-    }, [factToEdit, form]);
+    }, [adminFacts.isOpen, factToEdit, form]);
 
-    // Upload state for edit mode
-    const [fileList, setFileList] = useState<UploadFile<any>[]>([]);
-
-    const mainTextValue = Form.useWatch('mainText', form) || '';
-    const characterCount = mainTextValue.length;
-
-    // Допоміжна функція: конвертує File в base64 string (data URL format)
     const fileToBase64 = (file: File): Promise<string> => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -56,13 +55,19 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
         });
     };
 
+    const normFile = (e: any) => {
+        if (Array.isArray(e)) {
+            return e;
+        }
+        return e?.fileList;
+    };
+
     const onFinish = async (values: any) => {
         let imgId = factToEdit?.imageId;
 
-        // Handle image
-        if (values.picture && values.picture.fileList && values.picture.fileList.length > 0) {
-            const uploadedFile = values.picture.fileList[0]; // <-- Беремо з fileList
-            const file = uploadedFile.originFileObj as File; // <-- Це справжній File
+        if (values.picture && values.picture.length > 0) {
+            const uploadedFile = values.picture[0];
+            const file = uploadedFile.originFileObj as File;
             
             if (!file) {
                 Modal.error({ title: 'Помилка', content: 'Не вдалося отримати файл' });
@@ -88,43 +93,47 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
             imgId = createdImage.id;
         }
 
-        // imageId is required (for create mode)
         if (!imgId && !factToEdit) {
             Modal.error({ title: 'Помилка', content: 'Зображення є обовʼязковим' });
             return;
         }
 
-        if (factToEdit) {
-            // Edit Fact
-            const fact: Fact = {
-                id: factToEdit.id,
-                title: values.title,
-                factContent: values.mainText,
-                imageId: imgId!,
-                order: factToEdit.order,
-                imageDescription: values.imageDescription,
-            };
-            await factsStore.updateFact(fact);
-        } else {
-            // Create Fact
-            const fact: FactCreate = {
-                title: values.title,
-                factContent: values.mainText,
-                imageId: imgId!,
-                imageDescription: values.imageDescription,
-                streetcodeId: streetcodeId,
-            };
-            await factsStore.createFact(fact);
+        try {
+            if (factToEdit) {
+                const fact: Fact = {
+                    id: factToEdit.id,
+                    title: values.title,
+                    factContent: values.mainText,
+                    imageId: imgId!,
+                    order: factToEdit.order,
+                    imageDescription: values.imageDescription,
+                };
+                await factsStore.updateFact(fact);
+            } else {
+                const fact: FactCreate = {
+                    title: values.title,
+                    factContent: values.mainText,
+                    imageId: imgId!,
+                    imageDescription: values.imageDescription,
+                    streetcodeId: streetcodeId,
+                };
+                await factsStore.createFact(fact);
+            }
+            
+            form.resetFields();
+            setModal('adminFacts', undefined, false);
+        } catch (error) {
+            Modal.error({ 
+                title: 'Помилка', 
+                content: 'Не вдалося зберегти факт' 
+            });
         }
-        
-        form.resetFields();
-        setModal('adminFacts', undefined, false);
     };
 
     return (
         <Modal
             className="interestingFactsAdminModal"
-            open={true}
+            open={adminFacts.isOpen}
             onCancel={() => {
                 form.resetFields();
                 setModal('adminFacts', undefined, false);
@@ -138,25 +147,23 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
                 form={form}
                 className="factForm" 
                 onFinish={onFinish}
-                initialValues={{
-                    title: factToEdit?.title || '',
-                    mainText: factToEdit?.factContent || '',
-                    imageDescription: factToEdit?.imageDescription || '',
-                }}
             >
                 <h2>Wow-Факт</h2>
                 
                 <div className="inputBlock">
                     <p>Заголовок</p>
-                    <Form.Item 
-                        name="title" 
-                        rules={[
-                            { required: true, message: 'Поле обовʼязкове' },
-                            { max: 68, message: 'Максимум 68 символів' }
-                        ]}
-                    >
-                        <input maxLength={68} />
-                    </Form.Item>
+                    <div className="inputWithCounter">
+                        <Form.Item 
+                            name="title" 
+                            rules={[
+                                { required: true, message: 'Поле обовʼязкове' },
+                                { max: 68, message: 'Максимум 68 символів' }
+                            ]}
+                        >
+                            <input maxLength={68} />
+                        </Form.Item>
+                        <span className="inputCounter">{titleCount}/68</span>
+                    </div>
                 </div>
                 
                 <div className="textareaBlock">
@@ -171,7 +178,7 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
                         <textarea maxLength={600} />
                     </Form.Item>
                     <p className="characterCounter">
-                        {characterCount}/600
+                        {mainTextCount}/600
                     </p>
                 </div>
                 
@@ -179,6 +186,8 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
                     <p>Зображення:</p>
                     <FormItem 
                         name="picture"
+                        valuePropName="fileList"
+                        getValueFromEvent={normFile}
                         rules={[
                             { required: !factToEdit, message: 'Зображення обовʼязкове' }
                         ]}
@@ -200,15 +209,18 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
                 
                 <div className="imageDescriptionBlock">
                     <p>Підпис до фото</p>
-                    <Form.Item 
-                        name="imageDescription"
-                        rules={[
-                            { required: true, message: 'Поле обовʼязкове' },
-                            { max: 200, message: 'Максимум 200 символів' }
-                        ]}
-                    >
-                        <input maxLength={200} />
-                    </Form.Item>
+                    <div className="inputWithCounter">
+                        <Form.Item 
+                            name="imageDescription"
+                            rules={[
+                                { required: true, message: 'Поле обовʼязкове' },
+                                { max: 200, message: 'Максимум 200 символів' }
+                            ]}
+                        >
+                            <input maxLength={200} />
+                        </Form.Item>
+                        <span className="inputCounter">{imageDescCount}/200</span>
+                    </div>
                 </div>
                 
                 <Button className="saveButton" htmlType="submit">

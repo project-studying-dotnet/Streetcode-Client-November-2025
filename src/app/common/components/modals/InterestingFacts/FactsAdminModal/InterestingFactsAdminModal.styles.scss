@@ -18,7 +18,7 @@
         font-size: 20px !important;
         font-weight: 400 !important;
     }
-
+    
     // Стилі для вмісту модального вікна Ant Design
     .ant-modal-content {
         padding: 24px;
@@ -28,9 +28,11 @@
     // ============================================
     // ЗАГОЛОВОК МОДАЛЬНОГО ВІКНА
     // ============================================
-    h2 {
+    .factForm h2 {
         text-align: center;
         margin-bottom: 0 !important;
+        font-weight: 700 !important;
+        font-size: 24px !important;
     }
 
     // ============================================
@@ -39,7 +41,7 @@
     .factForm {
         display: flex;
         flex-direction: column;
-        gap: 24px; // Відступ між елементами форми
+        gap: 24px;
     }
 
     // ============================================
@@ -72,7 +74,7 @@
 
         // Стиль при фокусі (синя рамка)
         &:focus {
-            border-color: #4096ff !important;
+            border-color: #474747 !important;
             outline: none !important;
         }
     }
@@ -80,14 +82,14 @@
     // Додаткові налаштування для textarea
     textarea {
         min-height: 140px !important;
-        resize: none !important; // Заборона зміни розміру
+        resize: none !important;
     }
 
     // ============================================
     // ЛІЧИЛЬНИК СИМВОЛІВ (під textarea)
     // ============================================
     .characterCounter {
-        margin-top: -18px !important; // Підняття ближче до textarea
+        margin-top: -35px !important;
         font-size: 18px !important;
         text-align: right;
         color: #999 !important;
@@ -96,6 +98,43 @@
         // Прибираємо зірочку для лічильника
         &::before {
             content: "" !important;
+        }
+    }
+
+    // ============================================
+    // ОБГОРТКА ДЛЯ INPUT З ЛІЧИЛЬНИКОМ
+    // ============================================
+    .inputWithCounter {
+        position: relative;
+        width: 100%;
+
+        // Form.Item займає всю ширину
+        .ant-form-item {
+            margin-bottom: 0 !important;
+        }
+
+        // Input поле з відступом справа для лічильника
+        input {
+            padding-right: 70px !important;
+        }
+
+        // Лічильник всередині input поля (справа)
+        .inputCounter {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px !important;
+            color: #999 !important;
+            font-weight: 400 !important;
+            pointer-events: none;
+            user-select: none;
+            z-index: 1;
+        }
+
+        // Коли є помилка валідації, лічильник піднімається вище
+        .ant-form-item-has-error ~ .inputCounter {
+            top: calc(50% - 12px);
         }
     }
 
@@ -192,6 +231,39 @@
             box-shadow: 0 0 0 1px #e5393511, 0 2px 6px #e539353a !important;
         }
     }
+
+    // ============================================
+    // ПЕРЕХІДНІ ЕФЕКТИ ДЛЯ ПОЛІВ ВВОДУ
+    // ============================================
+    .inputBlock input,
+    .textareaBlock textarea {
+        transition: border-color 0.15s !important; // Плавна зміна кольору рамки
+    }
+
+    // Розширені стилі блоку завантаження
+    .uploadBlock {
+        // Вирівнювання wrapper
+        .ant-upload-wrapper {
+            width: 100%;
+            justify-content: start;
+        }
+
+        // Розташування карток зображень
+        .ant-upload-list-picture-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        // Стилі контейнера картки зображення
+        .ant-upload-list-picture-card-container {
+            background: #fafafa !important;
+            box-shadow: 0 1px 4px #0001 !important; // Легка тінь
+            border: 1.5px dashed #cfcfcf !important;
+            transition: border-color 0.2s !important; // Плавна зміна кольору рамки
+        }
+    }
 }
 
 // ============================================
@@ -265,40 +337,17 @@
         h2 {
             font-size: 20px !important;
         }
-    }
-}
 
-// ============================================
-// ПЕРЕХІДНІ ЕФЕКТИ ДЛЯ ПОЛІВ ВВОДУ
-// ============================================
-.interestingFactsAdminModal {
-    .inputBlock input,
-    .textareaBlock textarea {
-        transition: border-color 0.15s !important; // Плавна зміна кольору рамки
-    }
+        // Адаптивні стилі для лічильника в input
+        .inputWithCounter {
+            input {
+                padding-right: 60px !important; // Менше місце на мобільних
+            }
 
-    // Розширені стилі блоку завантаження
-    .uploadBlock {
-        // Вирівнювання wrapper
-        .ant-upload-wrapper {
-            width: 100%;
-            justify-content: start;
-        }
-
-        // Розташування карток зображень
-        .ant-upload-list-picture-card {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        // Стилі контейнера картки зображення
-        .ant-upload-list-picture-card-container {
-            background: #fafafa !important;
-            box-shadow: 0 1px 4px #0001 !important; // Легка тінь
-            border: 1.5px dashed #cfcfcf !important;
-            transition: border-color 0.2s !important; // Плавна зміна кольору рамки
+            .inputCounter {
+                font-size: 14px !important;
+                right: 10px;
+            }
         }
     }
 }
