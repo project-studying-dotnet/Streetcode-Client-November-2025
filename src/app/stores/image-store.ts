@@ -51,12 +51,15 @@ export default class ImageStore {
         } catch (error: unknown) {}
     };
 
-    public createImage = async (image: ImageCreate) => {
+    public createImage = async (image: ImageCreate): Promise<Image | null> => {
         try {
-            await imagesApi.create(image).then((resp) => {
-                this.setItem(resp);
-            });
-        } catch (error: unknown) {}
+            const createdImage = await imagesApi.create(image);
+            this.setItem(createdImage);
+            return createdImage;
+        } catch (error: unknown) {
+            console.error('Error creating image:', error);
+            return null;
+        }
     };
 
     public updateImage = async (image: Image) => {

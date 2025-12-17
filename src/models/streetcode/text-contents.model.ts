@@ -8,14 +8,22 @@ export interface Fact {
   id: number;
   title: string;
   factContent: string;
-  image?: Image;
   imageId: number;
+  image?: Image;
+  imageDescription?: string;
+  order: number;
 }
-export interface FactCreate extends Fact {
-  imageDescription?: string
+
+export interface FactCreate {
+  title: string;
+  factContent: string;
+  imageId: number;
+  streetcodeId: number;
+  imageDescription?: string;
 }
-export interface FactUpdate extends FactCreate, IModelState, IPersisted {
-    streetcodeId?: number;
+
+export interface FactUpdate extends Fact, IModelState, IPersisted {
+  streetcodeId?: number;
 }
 
 export interface Term {

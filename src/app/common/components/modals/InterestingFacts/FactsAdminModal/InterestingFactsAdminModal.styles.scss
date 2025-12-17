@@ -1,0 +1,353 @@
+// ============================================
+// ОСНОВНИЙ КОНТЕЙНЕР МОДАЛЬНОГО ВІКНА
+// ============================================
+.interestingFactsAdminModal {
+    // ГЛОБАЛЬНІ СТИЛІ ШРИФТУ - застосовуються до всього вмісту модального вікна
+    // Використовуємо високу специфічність, щоб перебити стилі Ant Design
+    .ant-modal-content,
+    .ant-modal-content *,
+    .ant-form-item,
+    .ant-form-item *,
+    input,
+    textarea,
+    button,
+    p,
+    span,
+    div {
+        font-family: 'Roboto', sans-serif !important;
+        font-size: 20px !important;
+        font-weight: 400 !important;
+    }
+    
+    // Стилі для вмісту модального вікна Ant Design
+    .ant-modal-content {
+        padding: 24px;
+        border-radius: 30px;
+    }
+
+    // ============================================
+    // ЗАГОЛОВОК МОДАЛЬНОГО ВІКНА
+    // ============================================
+    .factForm h2 {
+        text-align: center;
+        margin-bottom: 0 !important;
+        font-weight: 700 !important;
+        font-size: 24px !important;
+    }
+
+    // ============================================
+    // КОНТЕЙНЕР ФОРМИ
+    // ============================================
+    .factForm {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    // ============================================
+    // ЛЕЙБЛИ ПОЛІВ (з червоною зірочкою)
+    // ============================================
+    p {
+        margin: 0 0 6px !important;
+        font-weight: 500 !important;
+        font-size: 20px !important;
+
+        // Червона зірочка перед текстом (обов'язкове поле)
+        &::before {
+            content: "*";
+            color: #e53935;
+            margin-right: 3px;
+        }
+    }
+
+    // ============================================
+    // ТЕКСТОВІ ПОЛЯ (input і textarea)
+    // ============================================
+    input,
+    textarea {
+        width: 100%;
+        padding: 12px 14px !important;
+        font-size: 20px !important;
+        border: 1.5px solid #dcdcdc !important;
+        border-radius: 12px !important;
+        background: #fff !important;
+
+        // Стиль при фокусі (синя рамка)
+        &:focus {
+            border-color: #474747 !important;
+            outline: none !important;
+        }
+    }
+
+    // Додаткові налаштування для textarea
+    textarea {
+        min-height: 140px !important;
+        resize: none !important;
+    }
+
+    // ============================================
+    // ЛІЧИЛЬНИК СИМВОЛІВ (під textarea)
+    // ============================================
+    .characterCounter {
+        margin-top: -35px !important;
+        font-size: 18px !important;
+        text-align: right;
+        color: #999 !important;
+        font-weight: 400 !important;
+
+        // Прибираємо зірочку для лічильника
+        &::before {
+            content: "" !important;
+        }
+    }
+
+    // ============================================
+    // ОБГОРТКА ДЛЯ INPUT З ЛІЧИЛЬНИКОМ
+    // ============================================
+    .inputWithCounter {
+        position: relative;
+        width: 100%;
+
+        // Form.Item займає всю ширину
+        .ant-form-item {
+            margin-bottom: 0 !important;
+        }
+
+        // Input поле з відступом справа для лічильника
+        input {
+            padding-right: 70px !important;
+        }
+
+        // Лічильник всередині input поля (справа)
+        .inputCounter {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px !important;
+            color: #999 !important;
+            font-weight: 400 !important;
+            pointer-events: none;
+            user-select: none;
+            z-index: 1;
+        }
+
+        // Коли є помилка валідації, лічильник піднімається вище
+        .ant-form-item-has-error ~ .inputCounter {
+            top: calc(50% - 12px);
+        }
+    }
+
+    // ============================================
+    // БЛОК ЗАВАНТАЖЕННЯ ЗОБРАЖЕННЯ
+    // ============================================
+    .uploadBlock {
+        // Контейнер для Upload компонента
+        .ant-upload-wrapper {
+            width: 100%;
+        }
+
+        // Картка попереднього перегляду зображення
+        .ant-upload-list-picture-card-container {
+            width: 90px !important;
+            height: 90px !important;
+            border-radius: 10px !important;
+        }
+
+        // Кнопка для вибору зображення
+        .ant-upload.ant-upload-select-picture-card {
+            width: 90px !important;
+            height: 90px !important;
+            border-radius: 12px !important;
+            background: #fafafa !important;
+            border: 1.5px dashed #cfcfcf !important;
+
+            // Іконка та текст всередині кнопки завантаження
+            .upload {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 4px;
+                color: #6b6b6b !important;
+
+                // Текст у кнопці завантаження
+                p {
+                    font-size: 14px !important;
+                    margin: 0 !important;
+                }
+
+                // SVG іконка
+                svg {
+                    font-size: 24px !important;
+                }
+            }
+        }
+    }
+
+    .uploadBlock .upload p {
+        font-size: 14px !important;
+        font-weight: 400 !important;
+        margin: 0 !important;
+    }
+
+    // ============================================
+    // БЛОК ОПИСУ ЗОБРАЖЕННЯ (без зірочки)
+    // ============================================
+    .imageDescriptionBlock {
+        p::before {
+            content: "" !important; // Прибираємо зірочку для цього поля
+        }
+    }
+
+    // ============================================
+    // КНОПКА ЗБЕРЕЖЕННЯ
+    // ============================================
+    .saveButton {
+        background: #e84c3d !important; // Червоний фон
+        color: #fff !important;
+        border: none !important;
+        width: 100%;
+        height: 44px !important;
+        border-radius: 12px !important;
+        font-size: 20px !important;
+        font-weight: 600 !important;
+    }
+
+    // ============================================
+    // СТИЛІ ДЛЯ ПОМИЛОК ВАЛІДАЦІЇ
+    // ============================================
+    .ant-form-item-explain-error {
+        font-size: 14px !important;
+        color: #e53935 !important;
+    }
+
+    .ant-form-item-has-error {
+        input,
+        textarea {
+            color: #000 !important;
+            border-color: #e53935 !important;
+            outline: none !important;
+            box-shadow: 0 0 0 1px #e5393511, 0 2px 6px #e539353a !important;
+        }
+    }
+
+    // ============================================
+    // ПЕРЕХІДНІ ЕФЕКТИ ДЛЯ ПОЛІВ ВВОДУ
+    // ============================================
+    .inputBlock input,
+    .textareaBlock textarea {
+        transition: border-color 0.15s !important; // Плавна зміна кольору рамки
+    }
+
+    // Розширені стилі блоку завантаження
+    .uploadBlock {
+        // Вирівнювання wrapper
+        .ant-upload-wrapper {
+            width: 100%;
+            justify-content: start;
+        }
+
+        // Розташування карток зображень
+        .ant-upload-list-picture-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        // Стилі контейнера картки зображення
+        .ant-upload-list-picture-card-container {
+            background: #fafafa !important;
+            box-shadow: 0 1px 4px #0001 !important; // Легка тінь
+            border: 1.5px dashed #cfcfcf !important;
+            transition: border-color 0.2s !important; // Плавна зміна кольору рамки
+        }
+    }
+}
+
+// ============================================
+// АДАПТИВНІ СТИЛІ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ
+// ============================================
+@media (max-width: 500px) {
+    .interestingFactsAdminModal {
+        // Зменшення padding модального вікна
+        .ant-modal-content {
+            padding: 12px !important;
+            border-radius: 20px !important;
+        }
+
+        // Зменшення відступів між елементами форми
+        .factForm {
+            gap: 15px !important;
+        }
+
+        // Зменшення розмірів полів вводу
+        input,
+        textarea {
+            padding: 10px 8px !important;
+            font-size: 16px !important;
+            border-radius: 9px !important;
+        }
+
+        // Лейбли
+        p {
+            font-size: 16px !important;
+        }
+
+        // Лічильник символів
+        .characterCounter {
+            font-size: 14px !important;
+        }
+
+        // Зменшення кнопки
+        .saveButton {
+            height: 40px !important;
+            font-size: 18px !important;
+            border-radius: 10px !important;
+        }
+
+        // Налаштування модального вікна на весь екран
+        .ant-modal {
+            width: 96vw !important;
+            min-width: unset !important;
+            margin: 0 !important;
+            top: 9px !important;
+        }
+
+        // Зменшення розмірів блоку завантаження
+        .uploadBlock {
+            .ant-upload-list-picture-card-container,
+            .ant-upload.ant-upload-select-picture-card {
+                width: 68px !important;
+                height: 68px !important;
+                border-radius: 9px !important;
+            }
+
+            .upload p {
+                font-size: 12px !important;
+            }
+
+            .upload svg {
+                font-size: 20px !important;
+            }
+        }
+
+        // Заголовок
+        h2 {
+            font-size: 20px !important;
+        }
+
+        // Адаптивні стилі для лічильника в input
+        .inputWithCounter {
+            input {
+                padding-right: 60px !important; // Менше місце на мобільних
+            }
+
+            .inputCounter {
+                font-size: 14px !important;
+                right: 10px;
+            }
+        }
+    }
+}
