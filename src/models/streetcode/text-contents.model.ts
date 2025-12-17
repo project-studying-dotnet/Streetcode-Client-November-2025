@@ -4,7 +4,6 @@ import Image, { ImageCreate } from '@models/media/image.model';
 
 import Streetcode from './streetcode-types.model';
 
-// Базовий інтерфейс для відображення факту
 export interface Fact {
   id: number;
   title: string;
@@ -15,7 +14,6 @@ export interface Fact {
   order: number;
 }
 
-// Для створення нового факту
 export interface FactCreate {
   title: string;
   factContent: string;
@@ -24,7 +22,6 @@ export interface FactCreate {
   imageDescription?: string;
 }
 
-// Для оновлення факту
 export interface FactUpdate extends Fact, IModelState, IPersisted {
   streetcodeId?: number;
 }

@@ -127,6 +127,7 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
                 title: 'Помилка', 
                 content: 'Не вдалося зберегти факт' 
             });
+            console.log("Error: Fact has not been saved!");
         }
     };
 
