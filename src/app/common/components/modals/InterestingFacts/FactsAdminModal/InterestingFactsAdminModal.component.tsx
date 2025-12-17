@@ -123,11 +123,11 @@ const InterestingFactsModal = ({ streetcodeId = 1, factToEdit = null }: Interest
             form.resetFields();
             setModal('adminFacts', undefined, false);
         } catch (error) {
+            console.log("Error: Fact has not been saved!");
             Modal.error({ 
                 title: 'Помилка', 
                 content: 'Не вдалося зберегти факт' 
             });
-            console.log("Error: Fact has not been saved!");
         }
     };
 
