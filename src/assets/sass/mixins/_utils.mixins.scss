@@ -1,3 +1,4 @@
+@use 'sass:math';
 @use '../variables/variables.fonts' as ft;
 @use '../variables/variables.colors' as c;
 @use '../mixins/vendor.mixins' as vnd;
@@ -21,22 +22,22 @@
 
 
 @mixin set-positioning($top, $right, $bottom, $left) {
-  @if ($top == 'auto' or unit($top) == '%') {
+  @if ($top == 'auto' or math.unit($top) == '%') {
     top: $top;
   } @else {
     top: f.pxToRem($top);
   }
-  @if ($right == 'auto' or unit($right) == '%') {
+  @if ($right == 'auto' or math.unit($right) == '%') {
     right: $right;
   } @else {
     right: f.pxToRem($right);
   }
-  @if ($bottom == 'auto' or unit($bottom) == '%') {
+  @if ($bottom == 'auto' or math.unit($bottom) == '%') {
     bottom: $bottom;
   } @else {
     bottom: f.pxToRem($bottom);
   }
-  @if ($left == 'auto' or unit($left) == '%') {
+  @if ($left == 'auto' or math.unit($left) == '%') {
     left: $left;
   } @else {
     left: f.pxToRem($left);
@@ -49,24 +50,24 @@
 }
 
 @mixin sized($width: auto, $height: auto) {
-  @if ($width == 'auto' or $width == 'inherit' or unit($width) == '%') {
+  @if ($width == 'auto' or $width == 'inherit' or math.unit($width) == '%') {
     width: $width ;
   } @else {
     width: f.pxToRem($width) ;
   }
-  @if ($height == 'auto' or $height == 'inherit' or unit($height) == '%') {
+  @if ($height == 'auto' or $height == 'inherit' or math.unit($height) == '%') {
     height: $height ;
   } @else {
     height: f.pxToRem($height);
   }
 }
 @mixin sizedImportant($width: auto, $height: auto) {
-  @if ($width == 'auto' or $width == 'inherit' or unit($width) == '%') {
+  @if ($width == 'auto' or $width == 'inherit' or math.unit($width) == '%') {
     width: $width !important ;
   } @else {
     width: f.pxToRem($width) !important ;
   }
-  @if ($height == 'auto' or $height == 'inherit' or unit($height) == '%') {
+  @if ($height == 'auto' or $height == 'inherit' or math.unit($height) == '%') {
     height: $height !important ;
   } @else {
     height: f.pxToRem($height) !important;

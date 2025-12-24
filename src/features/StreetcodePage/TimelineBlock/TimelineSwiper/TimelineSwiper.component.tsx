@@ -1,4 +1,6 @@
-import 'swiper/scss';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import './TimelineSwiper.styles.scss';
 
 import { observer } from 'mobx-react-lite';

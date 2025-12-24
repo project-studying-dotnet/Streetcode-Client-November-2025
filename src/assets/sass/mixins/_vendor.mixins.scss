@@ -1,3 +1,5 @@
+@use "sass:string";
+@use "sass:list";
 @use "@assets/sass/_utils.functions.scss" as f;
 
 /// Vendor prefixes.
@@ -49,16 +51,16 @@ $vendor-values: (
 @mixin vendored($property, $value) {
 
   // Determine if property should expand.
-  $expandProperty: index($vendor-properties, $property);
+  $expandProperty: list.index($vendor-properties, $property);
 
   // Determine if value should expand (and if so, add '-prefix-' placeholder).
   $expandValue: false;
 
   @each $x in $value {
     @each $y in $vendor-values {
-      @if $y == str-slice($x, 1, str-length($y)) {
+      @if $y == string.slice($x, 1, string.length($y)) {
 
-        $value: set-nth($value, index($value, $x), '-prefix-' + $x);
+        $value: list.set-nth($value, list.index($value, $x), '-prefix-' + $x);
         $expandValue: true;
       }
     }
