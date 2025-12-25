@@ -1,0 +1,65 @@
+@use "sass:color";
+@use "@sass/mixins/_utils.mixins.scss" as mut;
+
+.loginButton {
+    width: 77px;
+    height: 39px;
+    padding: 9px 20px;
+    border-radius: 10px;
+    border: 2px solid #DB3424;
+    background-color: transparent;
+    color: #DB3424;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-right: 12px;
+    flex-shrink: 0;
+    
+    &:hover {
+        background-color: #DB3424;
+        color: white;
+    }
+}
+
+.profileCircle {
+    @include mut.sized(40px, 40px);
+    @include mut.flex-centered();
+    @include mut.full-rounded(50%);
+    
+    background-color: #F0F3F9;
+    margin-right: 30px;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    .profileIcon {
+        font-size: 20px;
+        color: #8C8C8C;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 6px;
+    }
+
+    &:hover {
+        background-color: color.adjust(#F0F3F9, $lightness: -5%);
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .loginButton {
+        width: 65px;
+        height: 34px;
+        padding: 7px 14px;
+        font-size: 14px;
+        margin-right: 8px;
+    }
+
+    .profileCircle {
+        @include mut.sized(36px, 36px);
+        margin-right: px;
+
+        .profileIcon {
+            font-size: 18px;
+        }
+    }
+}

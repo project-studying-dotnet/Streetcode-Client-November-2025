@@ -12,6 +12,7 @@ import useEventListener from '@hooks/external/useEventListener.hook';
 import useOnClickOutside from '@hooks/stateful/useClickOutside.hook';
 import useToggle from '@hooks/stateful/useToggle.hook';
 import HeaderDrawer from '@layout/header/HeaderDrawer/HeaderDrawer.component';
+import ProfileCircle from '@layout/header/ProfileCircle/ProfileCircle.component';
 import HeaderSkeleton from '@layout/header/HeaderSkeleton/HeaderSkeleton.component';
 import useMobx, { useModalContext } from '@stores/root-store';
 
@@ -86,6 +87,7 @@ const HeaderBlock = () => {
                                 style={isPageDimmed ? { zIndex: '-1' } : undefined}
                             />
                         )}
+                        <ProfileCircle />
                         <HeaderDrawer />
                         <Button
                             type="primary"
