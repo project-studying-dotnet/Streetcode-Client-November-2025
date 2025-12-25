@@ -7,7 +7,7 @@ import FRONTEND_ROUTES from '../common/constants/frontend-routes.constants';
 import UserLoginStore from '../stores/user-login-store';
 
 axios.defaults.baseURL = process.env.NODE_ENV === 'development'
-    ? 'https://localhost:5001/api' : 'https://app-streetcode-webapi-eu-prop-001-gsbqfwc2fdh6hhaw.polandcentral-01.azurewebsites.net/api';
+    ? 'https://localhost:7146/api' : 'https://app-streetcode-webapi-eu-prop-001-gsbqfwc2fdh6hhaw.polandcentral-01.azurewebsites.net/api';
 
 axios.interceptors.response.use(
     async (response) => response,
