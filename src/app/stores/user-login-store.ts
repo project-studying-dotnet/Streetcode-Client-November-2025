@@ -8,18 +8,28 @@ export default class UserLoginStore {
 
     private static tokenStorageName = 'token';
 
+    private static refreshTokenStorageName = 'refreshToken';
+
     private static dateStorageName = 'expireAt';
 
     public userLoginResponce?: UserLoginResponce;
+
+    public isUserLoggedIn: boolean = false;
 
     private callback?:()=>void;
 
     public constructor() {
         makeAutoObservable(this);
+        // Check initial login state from localStorage
+        const token = UserLoginStore.getToken();
+        const expireAt = UserLoginStore.getExpiredDate();
+        this.isUserLoggedIn = !!token && expireAt > Date.now();
     }
 
     private static getExpiredDate():number {
-        return Number(localStorage.getItem(UserLoginStore.dateStorageName)!);
+        const expireAt = localStorage.getItem(UserLoginStore.dateStorageName);
+        if (!expireAt) return 0;
+        return Number(expireAt);
     }
 
     private static setExpiredDate(date: string):void {
@@ -34,8 +44,17 @@ export default class UserLoginStore {
         return localStorage.setItem(UserLoginStore.tokenStorageName, newToken);
     }
 
+    public static getRefreshToken() {
+        return localStorage.getItem(UserLoginStore.refreshTokenStorageName);
+    }
+
+    public static setRefreshToken(refreshToken: string) {
+        return localStorage.setItem(UserLoginStore.refreshTokenStorageName, refreshToken);
+    }
+
     private static clearToken() {
         localStorage.removeItem(UserLoginStore.tokenStorageName);
+        localStorage.removeItem(UserLoginStore.refreshTokenStorageName);
     }
 
     public setCallback(func:()=>void) {
@@ -51,21 +70,38 @@ export default class UserLoginStore {
             clearTimeout(this.timeoutHandler);
         }
         localStorage.removeItem(UserLoginStore.tokenStorageName);
+        localStorage.removeItem(UserLoginStore.refreshTokenStorageName);
         localStorage.removeItem(UserLoginStore.dateStorageName);
+        this.userLoginResponce = undefined;
+        this.isUserLoggedIn = false;
     }
 
-    public logout() {
+    public async logout() {
+        const refreshToken = UserLoginStore.getRefreshToken();
+        if (refreshToken) {
+            try {
+                await UserApi.logout({ refreshToken });
+            } catch (e) {
+                console.log('Logout error:', e);
+            }
+        }
         this.clearUserData();
     }
 
     public setUserLoginResponce(user:UserLoginResponce, func:()=>void) {
         try {
-            const timeNumber = (new Date(user.expireAt)).getTime();
+            // If expireAt is not provided, set a default expiration of 24 hours
+            const expireAt = user.expireAt ? new Date(user.expireAt) : new Date(Date.now() + 24 * 60 * 60 * 1000);
+            const timeNumber = expireAt.getTime();
             UserLoginStore.setExpiredDate(timeNumber.toString());
             const expireForSeconds = timeNumber - new Date().getTime();
             this.setCallback(func);
             this.userLoginResponce = user;
             UserLoginStore.setToken(user.token);
+            if (user.refreshToken) {
+                UserLoginStore.setRefreshToken(user.refreshToken);
+            }
+            this.isUserLoggedIn = true;
             if (expireForSeconds > 10000) {
                 this.timeoutHandler = setTimeout(() => {
                     if (this.callback) {
