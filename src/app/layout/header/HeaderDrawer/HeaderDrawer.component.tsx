@@ -2,6 +2,7 @@ import './HeaderDrawer.styles.scss';
 
 import CancelBtn from '@images/utils/Cancel_btn_drawer_mobile.svg';
 
+import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { useLocation } from 'react-router-dom';
@@ -13,6 +14,7 @@ import { Drawer } from 'antd';
 
 import FRONTEND_ROUTES from '@/app/common/constants/frontend-routes.constants';
 import HeaderDrawerItem from '@/app/layout/header/HeaderDrawer/HeaderDrawerItem/HeaderDrawerItem.component';
+import useMobx from '@/app/stores/root-store';
 
 import SocialMediaLinks from './SocialMediaLinks/SocialMediaLinks.component';
 
@@ -47,6 +49,8 @@ const HeaderDrawer = () => {
     const [options, setOptions] = useState(desktopOptions);
     const [scalingCooficient, setScalingCooficient] = useState(scaleDesktop);
     const location = useLocation();
+    const { userLoginStore } = useMobx();
+    const isLoggedIn = userLoginStore.isUserLoggedIn;
 
     const isSmall = useMediaQuery({
         query: '(max-width: 1024px)',
@@ -102,13 +106,15 @@ const HeaderDrawer = () => {
                                 link={FRONTEND_ROUTES.OTHER_PAGES.CATALOG}
                                 toggleState={toggle}
                             />
-                            <HeaderDrawerItem
-                                id={3}
-                                parentActive={active}
-                                text="Адмін-панель"
-                                link={FRONTEND_ROUTES.ADMIN.BASE}
-                                toggleState={toggle}
-                            />
+                            {isLoggedIn && (
+                                <HeaderDrawerItem
+                                    id={3}
+                                    parentActive={active}
+                                    text="Адмін-панель"
+                                    link={FRONTEND_ROUTES.ADMIN.BASE}
+                                    toggleState={toggle}
+                                />
+                            )}
                             <HeaderDrawerItem
                                 id={4}
                                 parentActive={active}
@@ -162,4 +168,4 @@ const HeaderDrawer = () => {
     );
 };
 
-export default HeaderDrawer;
+export default observer(HeaderDrawer);
