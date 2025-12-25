@@ -9,6 +9,13 @@ module.exports = {
         open: true,
         port: "3000",
         historyApiFallback: true,
+        client: {
+            overlay: {
+                errors: false,
+                warnings: false,
+                runtimeErrors: false,
+            },
+        },
     },
     module: {
         rules: require('./webpack.rules'),
