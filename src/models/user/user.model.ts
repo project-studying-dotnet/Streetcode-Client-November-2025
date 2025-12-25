@@ -3,19 +3,36 @@ export default interface User {
     name:string;
     surname:string;
     email:string;
-    login:string;
+    userName:string;
     password:string;
-    userRole:UserRole;
+    phoneNumber:string;
+    role:UserRole;
+}
+
+export interface UserRegisterRequest {
+    name: string;
+    surname: string;
+    email: string;
+    userName: string;
+    password: string;
+    phoneNumber: string;
+    role: UserRole;
 }
 
 export interface UserLoginRequest {
-    login:string;
+    email:string;
     password:string;
 }
+
 export interface UserLoginResponce {
     user:User;
     token:string;
+    refreshToken:string;
     expireAt:Date;
+}
+
+export interface LogoutRequest {
+    refreshToken:string;
 }
 
 export interface RefreshTokenRequest {
@@ -28,7 +45,8 @@ export interface RefreshTokenResponce {
 }
 
 export enum UserRole {
-    MainAdministrator,
-    Administrator,
-    Moderator,
+    User = 0,
+    MainAdministrator = 1,
+    Administrator = 2,
+    Moderator = 3,
 }
