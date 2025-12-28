@@ -6,8 +6,7 @@ import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import FRONTEND_ROUTES from '../common/constants/frontend-routes.constants';
 import UserLoginStore from '../stores/user-login-store';
 
-axios.defaults.baseURL = process.env.NODE_ENV === 'development'
-    ? 'https://localhost:7146/api' : 'https://app-streetcode-webapi-eu-prop-001-gsbqfwc2fdh6hhaw.polandcentral-01.azurewebsites.net/api';
+axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL || 'https://localhost:5001/api';
 
 axios.interceptors.response.use(
     async (response) => response,
