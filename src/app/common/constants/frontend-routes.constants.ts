@@ -20,6 +20,8 @@ const FRONTEND_ROUTES = {
         PARTNERS: '/partners-page',
         SUPPORT_US: '/support-us',
         NEWS: '/news',
+        LOGIN: '/login',
+        SIGNUP: '/signup',
     },
 };
 
