@@ -78,6 +78,33 @@
     }
 }
 
+.favoriteButton {
+    @include mut.positioned-as(absolute);
+    top: pxToRem(12px);
+    right: pxToRem(12px);
+    @include mut.sized(pxToRem(43px), pxToRem(43px));
+    @include mut.flex-centered();
+    
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: pxToRem(22px);
+    @include vnd.vendored(transition, 'all 0.2s ease');
+    box-shadow: 0 pxToRem(2px) pxToRem(8px) rgba(0, 0, 0, 0.15);
+    z-index: 10;
+
+    &:hover {
+        @include vnd.vendored(transform, 'scale(1.1)');
+        box-shadow: 0 pxToRem(4px) pxToRem(12px) rgba(0, 0, 0, 0.25);
+    }
+
+    &.mobile {
+        @include mut.sized(pxToRem(40px), pxToRem(40px));
+        font-size: pxToRem(20px);
+    }
+}
+
 @media screen and (max-width: 1024px) {
     .catalogItem {
       @include mut.sized($width: 165px, $height: 165px);

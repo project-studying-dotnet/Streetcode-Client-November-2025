@@ -27,6 +27,35 @@ $loadImg: '@assets/images/catalog/loading.gif';
             align-items: center;
             color: c.$milky-white-color;
         }
+
+        .catalogFilterButtons {
+            @include mut.flexed($gap: pxToRem(12px));
+            @include mut.rem-margined($bottom: 24px);
+
+            .filterButton {
+                @include mut.rem-padded(10px, 20px, 10px, 20px);
+                @include mut.full-rounded(pxToRem(8px));
+                @include vnd.vendored(transition, 'all 0.2s ease');
+                
+                cursor: pointer;
+                font-size: pxToRem(16px);
+                background: c.$pure-white-color;
+                color: c.$lighter-black-color;
+                border: 1px solid c.$darker-gray-color;
+                font-weight: normal;
+
+                &.active {
+                    border: 2px solid c.$dark-red-color;
+                    background: c.$dark-red-color;
+                    color: c.$pure-white-color;
+                    font-weight: bold;
+                }
+
+                &:hover {
+                    opacity: 0.9;
+                }
+            }
+        }
     
         .steetcodeCatalogContainer {
             display: grid;

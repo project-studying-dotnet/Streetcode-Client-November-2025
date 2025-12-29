@@ -32,6 +32,7 @@ import StreetcodesByTagStore from './streetcodes-bytag-store';
 import TeamStore from './team-store';
 import ToponymStore from './toponym-store';
 import UserLoginStore from './user-login-store';
+import FavoritesStore from './favorites-store';
 
 interface Store {
     factsStore: FactsStore,
@@ -63,6 +64,7 @@ interface Store {
     relatedByTag: StreetcodesByTagStore,
     createUpdateMediaStore: CreateUpdateMediaStore,
     modalStore: ModalStore,
+    favoritesStore: FavoritesStore,
 }
 
 export interface StreetcodeDataStore {
@@ -101,7 +103,8 @@ export const store: Store = {
     streetcodeMainPageStore: new StreetcodesMainPageStore(),
     relatedByTag: new StreetcodesByTagStore(),
     createUpdateMediaStore: new CreateUpdateMediaStore(),
-    modalStore: new ModalStore()
+    modalStore: new ModalStore(),
+    favoritesStore: new FavoritesStore()
 };
 export const streetcodeDataStore:StreetcodeDataStore = {
     streetcodeStore: new StreetcodeStore(),
