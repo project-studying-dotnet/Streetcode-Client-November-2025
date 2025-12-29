@@ -11,14 +11,19 @@ import { useAsync } from '@/app/common/hooks/stateful/useAsync.hook';
 import StreetcodeCatalogItem from './StreetcodeCatalogItem/StreetcodeCatalogItem.component';
 
 const StreetcodeCatalog = () => {
-    const { streetcodeCatalogStore } = useMobx();
+    const { streetcodeCatalogStore, favoritesStore } = useMobx();
     const { fetchCatalogStreetcodes, getCatalogStreetcodesArray } = streetcodeCatalogStore;
     const [loading, setLoading] = useState(false);
     const [screen, setScreen] = useState(1);
+    const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
 
     const handleSetNextScreen = () => {
         setScreen(screen + 1);
     };
+
+    const filteredStreetcodes = showOnlyFavorites
+        ? getCatalogStreetcodesArray.filter((streetcode) => favoritesStore.isFavorite(streetcode.id))
+        : getCatalogStreetcodesArray;
 
     useAsync(async () => {
         const count = await StreetcodesApi.getCount();
@@ -37,14 +42,28 @@ const StreetcodeCatalog = () => {
         <div className="catalogPage">
             <div className="streetcodeCatalogWrapper">
                 <h1 className="streetcodeCatalogHeading">Стріткоди</h1>
+                <div className="catalogFilterButtons">
+                    <button
+                        className={`filterButton ${!showOnlyFavorites ? 'active' : ''}`}
+                        onClick={() => setShowOnlyFavorites(false)}
+                    >
+                        Усі стріткоди
+                    </button>
+                    <button
+                        className={`filterButton ${showOnlyFavorites ? 'active' : ''}`}
+                        onClick={() => setShowOnlyFavorites(true)}
+                    >
+                        Улюблені стріткоди
+                    </button>
+                </div>
                 <div className="steetcodeCatalogContainer">
                     {
-                        getCatalogStreetcodesArray.map(
+                        filteredStreetcodes.map(
                             (streetcode, index) => (
                                 <StreetcodeCatalogItem
                                     key={streetcode.id}
                                     streetcode={streetcode}
-                                    isLast={index === getCatalogStreetcodesArray.length - 1}
+                                    isLast={index === filteredStreetcodes.length - 1}
                                     handleNextScreen={handleSetNextScreen}
                                 />
                             ),

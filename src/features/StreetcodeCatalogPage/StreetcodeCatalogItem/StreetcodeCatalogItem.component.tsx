@@ -4,6 +4,7 @@ import './StreetcodeCatalogItem.styles.scss';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { HeartFilled, HeartOutlined } from '@ant-design/icons';
 import useMobx from '@stores/root-store';
 
 import useOnScreen from '@/app/common/hooks/scrolling/useOnScreen.hook';
@@ -20,7 +21,7 @@ interface Props {
 }
 
 const StreetcodeCatalogItem = ({ streetcode, isLast, handleNextScreen }: Props) => {
-    const { imagesStore: { getImage, fetchImage } } = useMobx();
+    const { imagesStore: { getImage, fetchImage }, favoritesStore } = useMobx();
     const elementRef = useRef<HTMLDivElement>(null);
     const classSelector = 'catalogItem';
     const isOnScreen = useOnScreen(elementRef, classSelector);
@@ -38,26 +39,43 @@ const StreetcodeCatalogItem = ({ streetcode, isLast, handleNextScreen }: Props) 
     }
     const windowsize = useWindowSize();
 
+    const handleFavoriteClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        favoritesStore.toggleFavorite(streetcode.id);
+    };
+
+    const isFavorited = favoritesStore.isFavorite(streetcode.id);
+
     return (
         <>
             {windowsize.width > 1024 && (
-                <Link {...LinkProps} onClick={() => toStreetcodeRedirectClickEvent(streetcode.url, 'catalog')}>
-                    <div ref={elementRef} className="catalogItemText">
-                        <div className="heading">
-                            <p>{streetcode.title}</p>
-                            {
-                                streetcode.alias !== null ? (
-                                    <p className="aliasText">
-                                        ({streetcode.alias})
-                                    </p>
-                                ) : undefined
-                            }
+                <div style={{ position: 'relative' }}>
+                    <Link {...LinkProps} onClick={() => toStreetcodeRedirectClickEvent(streetcode.url, 'catalog')}>
+                        <div ref={elementRef} className="catalogItemText">
+                            <div className="heading">
+                                <p>{streetcode.title}</p>
+                                {
+                                    streetcode.alias !== null ? (
+                                        <p className="aliasText">
+                                            ({streetcode.alias})
+                                        </p>
+                                    ) : undefined
+                                }
+                            </div>
                         </div>
-                    </div>
-                </Link>
+                    </Link>
+                    <button
+                        onClick={handleFavoriteClick}
+                        aria-label={isFavorited ? 'Видалити з улюбленого' : 'Додати в улюблене'}
+                        className="favoriteButton"
+                    >
+                        {isFavorited ? <HeartFilled style={{ color: '#C12828' }} /> : <HeartOutlined style={{ color: '#666' }} />}
+                    </button>
+                </div>
             )}
             {windowsize.width <= 1024 && (
-                <div>
+                <div style={{ position: 'relative' }}>
                     <Link {...LinkProps} />
                     <div ref={elementRef} className="catalogItemText mobile">
                         <div className="heading">
@@ -71,6 +89,13 @@ const StreetcodeCatalogItem = ({ streetcode, isLast, handleNextScreen }: Props) 
                             }
                         </div>
                     </div>
+                    <button
+                        onClick={handleFavoriteClick}
+                        aria-label={isFavorited ? 'Видалити з улюбленого' : 'Додати в улюблене'}
+                        className="favoriteButton mobile"
+                    >
+                        {isFavorited ? <HeartFilled style={{ color: '#C12828' }} /> : <HeartOutlined style={{ color: '#666' }} />}
+                    </button>
                 </div>
             )}
         </>
