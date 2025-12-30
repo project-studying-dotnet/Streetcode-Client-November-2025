@@ -7,6 +7,7 @@ const AdminBar = () => (
         <Link className="Link" to={FRONTEND_ROUTES.ADMIN.FOR_FANS}>Для фанів</Link>
         <Link className="Link" to={FRONTEND_ROUTES.ADMIN.PARTNERS}>Партнери</Link>
         <Link className="Link" to={FRONTEND_ROUTES.ADMIN.TEAM}>Команда</Link>
+        <Link className="Link" to={FRONTEND_ROUTES.ADMIN.CHRONOLOGY}>Хронологія</Link>
     </div>   
 );
 
