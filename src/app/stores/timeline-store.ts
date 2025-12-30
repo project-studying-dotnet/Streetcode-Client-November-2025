@@ -109,6 +109,13 @@ export default class TimelineStore {
         } catch (error: unknown) { /* empty */ }
     };
 
+    public fetchAllTimelineItems = async () => {
+        try {
+            const timelineItems = await timelineApi.getAll();
+            this.setInternalMap(timelineItems);
+        } catch (error: unknown) { /* empty */ }
+    };
+
     public createTimelineItem = async (timelineItem: TimelineItem) => {
         try {
             await timelineApi.create(timelineItem);

@@ -11,6 +11,7 @@ import SignupPage from '@/features/AdditionalPages/SignupPage/SignupPage.compone
 import AdminPage from '@/features/AdminPage/AdminPage.component';
 import Partners from '@/features/AdminPage/PartnersPage/Partners.component';
 import TeamPage from '@/features/AdminPage/TeamPage/TeamPage.component';
+import ChronologyPage from '@/features/AdminPage/ChronologyPage/ChronologyPage.component';
 import StreetcodeCatalog from '@/features/StreetcodeCatalogPage/StreetcodeCatalog.component';
 import NewsPage from '@/features/AdditionalPages/NewsPage/News.component';
 import ContactUs from '@/features/AdditionalPages/ContactUsPage/ContanctUs.component';
@@ -43,6 +44,10 @@ const router = createBrowserRouter(createRoutesFromElements(
             element={(
                     <ProtectedRoute><TeamPage /></ProtectedRoute>
             )}
+        />
+        <Route
+            path={FRONTEND_ROUTES.ADMIN.CHRONOLOGY}
+            element={<ChronologyPage />}
         />
         <Route path="*" element={<NotFound />} />
         <Route path={FRONTEND_ROUTES.OTHER_PAGES.PARTNERS} element={<PartnersPage />} />
